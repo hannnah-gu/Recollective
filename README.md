@@ -4,7 +4,7 @@
 
 Recollective is a web application aimed at making daily tasks more accessible to people with dementia while also providing caregivers with tools to assist their residents.
 
-The goal of Recollective is to help residents maintain independence by providing simple visual and voice based guidance throughout the day.
+The goal of Recollective is to help residents maintain independence by providing simple visual and voice based guidance throughout the day to hopefully provide them the "Perfect Day".
 
 Some of the biggest challenges faced by people with dementia center around decrease in pattern recognition. Pattern recognition, maintaining routines, and understanding the context of their location can become difficult when individuals with dementia are without a caregiver.
 
