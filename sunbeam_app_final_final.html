@@ -1,0 +1,3577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Recollective</title>
+
+<!-- CSS section -->
+    <style>
+
+        /* GLOBAL */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            background: #626262;
+        }
+
+        body {
+            min-height: 100vh;
+
+            font-family:
+                Impact,
+                Haettenschweiler,
+                "Arial Narrow Bold",
+                sans-serif;
+
+            overflow-x: hidden;
+        }
+
+        /* SCREEN SYSTEM */
+
+        .screen {
+
+            position: absolute;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            min-height: 100vh;
+
+            background: #626262;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 40px 25px;
+
+            opacity: 1;
+            transform: translateY(0);
+
+            transition:
+                opacity 0.45s ease,
+                transform 0.45s ease;
+        }
+
+        .screen.hidden {
+
+            opacity: 0;
+
+            transform: translateY(15px);
+
+            pointer-events: none;
+        }
+
+        /* WELCOME */
+
+        .logo {
+
+            color: #ffc226;
+
+            font-size: clamp(60px, 9vw, 110px);
+
+            line-height: 0.9;
+
+            text-align: center;
+        }
+
+        .subtitle {
+
+            color: #ff5757;
+
+            font-size: clamp(40px, 6vw, 70px);
+
+            margin-top: 20px;
+            margin-bottom: 25px;
+
+            text-align: center;
+        }
+
+        /* LOCATION BUTTON */
+
+        .location-button {
+
+            width: min(670px, 90%);
+
+            min-height: 235px;
+
+            border: none;
+
+            border-radius: 70px;
+
+            background: #ffc42c;
+
+            color: #0788d1;
+
+            font-family: inherit;
+
+            font-size: clamp(30px, 4vw, 48px);
+
+            padding: 30px;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.15s ease,
+                opacity 0.2s ease;
+        }
+
+        .location-button:hover {
+            transform: scale(1.02);
+        }
+
+        .location-button:active {
+            transform: scale(0.98);
+        }
+
+        /* INFO BUTTON */
+
+        .info-button {
+
+            margin-top: 12px;
+
+            min-width: 215px;
+            height: 120px;
+
+            border: none;
+
+            border-radius: 60px;
+
+            background: #ffc42c;
+
+            color: #0788d1;
+
+            font-family: inherit;
+
+            font-size: 45px;
+
+            cursor: pointer;
+
+            transition: transform 0.15s ease;
+        }
+
+        .info-button:hover {
+            transform: scale(1.04);
+        }
+
+        /* PHONE SCREEN */
+
+        #phoneScreen {
+            gap: 25px;
+        }
+
+        .phone-heading-row,
+        .spatial-heading-row {
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 20px;
+
+            position: relative;
+        }
+
+        .phone-title,
+        .spatial-title {
+
+            color: #ff5757;
+
+            font-size: clamp(50px, 7vw, 90px);
+
+            text-align: center;
+        }
+
+        /* QUESTION MARK BUTTON */
+
+        .help-container {
+            position: relative;
+        }
+
+        .help-button {
+
+            width: 88px;
+            height: 88px;
+
+            border: none;
+
+            border-radius: 50%;
+
+            background: #ffc42c;
+
+            color: #ff5757;
+
+            font-family: inherit;
+
+            font-size: 32px;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            transition: transform 0.15s ease;
+        }
+
+        .help-button:hover,
+        .help-button:focus {
+
+            transform: scale(1.08);
+
+            outline: none;
+        }
+
+        /* TOOLTIP (basicallt the stuff on the scheduling page) */
+
+        .tooltip {
+
+            position: absolute;
+
+            width: 310px;
+
+            bottom: 110px;
+            left: 50%;
+
+            transform:
+                translateX(-50%)
+                translateY(10px);
+
+            background: white;
+
+            color: #454545;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 17px;
+
+            font-weight: 600;
+
+            line-height: 1.4;
+
+            padding: 18px;
+
+            border-radius: 18px;
+
+            text-align: center;
+
+            opacity: 0;
+
+            visibility: hidden;
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease;
+
+            z-index: 20;
+
+            box-shadow:
+                0 8px 25px
+                rgba(0, 0, 0, 0.25);
+        }
+
+        .tooltip::after {
+
+            content: "";
+
+            position: absolute;
+
+            top: 100%;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            border-width: 10px;
+
+            border-style: solid;
+
+            border-color:
+                white
+                transparent
+                transparent
+                transparent;
+        }
+
+        .help-container:hover .tooltip,
+        .help-button:focus + .tooltip,
+        .tooltip.show {
+
+            opacity: 1;
+
+            visibility: visible;
+
+            transform:
+                translateX(-50%)
+                translateY(0);
+        }
+
+        /* PHONE NUMBER BOX */
+
+        .phone-box,
+        .spatial-box {
+
+            width: min(940px, 90%);
+
+            min-height: 330px;
+
+            background: #ffc42c;
+
+            border-radius: 90px;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 45px;
+
+            gap: 25px;
+        }
+
+        /* PHONE INPUT BOX */
+
+        .phone-input {
+
+            width: min(650px, 90%);
+
+            padding: 25px 30px;
+
+            border: 5px solid transparent;
+
+            border-radius: 30px;
+
+            background: white;
+
+            color: #4c4c4c;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: clamp(26px, 4vw, 45px);
+
+            font-weight: bold;
+
+            text-align: center;
+
+            outline: none;
+
+            transition:
+                border 0.2s ease,
+                transform 0.2s ease;
+        }
+
+        .phone-input:focus {
+
+            border-color: #0788d1;
+
+            transform: scale(1.01);
+        }
+
+        .phone-input.invalid {
+            border-color: #ff5757;
+        }
+
+        .phone-input.valid {
+            border-color: #36a852;
+        }
+
+        /* VALIDATION OF PHONE NUMBER */
+
+        .validation-message {
+
+            min-height: 25px;
+
+            color: #d43c3c;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 17px;
+
+            font-weight: bold;
+
+            text-align: center;
+        }
+
+        /* CONTINUE BUTTON */
+
+        .continue-button {
+
+            padding: 18px 55px;
+
+            border: none;
+
+            border-radius: 35px;
+
+            background: #0788d1;
+
+            color: white;
+
+            font-family: inherit;
+
+            font-size: 30px;
+
+            cursor: pointer;
+
+            opacity: 0.35;
+
+            pointer-events: none;
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.15s ease;
+        }
+
+        .continue-button.enabled {
+
+            opacity: 1;
+
+            pointer-events: auto;
+        }
+
+        .continue-button.enabled:hover {
+            transform: scale(1.05);
+        }
+
+        /* SPATIAL FEATURE PAGE */
+
+        #spatialScreen {
+            gap: 65px;
+        }
+
+        .spatial-instruction {
+
+            color: #ff5757;
+
+            font-size: clamp(45px, 6vw, 75px);
+
+            text-align: center;
+        }
+
+        /* BLUE SET LOCATION BUTTONS */
+
+        .set-location-button {
+
+            width: min(610px, 85%);
+
+            min-height: 115px;
+
+            border: none;
+
+            border-radius: 60px;
+
+            background: #0788d1;
+
+            color: #ffc42c;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: clamp(28px, 4vw, 48px);
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            padding: 20px;
+
+            transition:
+                transform 0.15s ease,
+                opacity 0.2s ease;
+        }
+
+        .set-location-button:hover {
+            transform: scale(1.03);
+        }
+
+        .set-location-button:active {
+            transform: scale(0.97);
+        }
+
+        .set-location-button:disabled {
+
+            opacity: 0.6;
+
+            cursor: wait;
+        }
+
+        .spatial-status {
+
+            min-height: 25px;
+
+            color: #0788d1;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            text-align: center;
+        }
+
+        /* PROGRESS THROUGH DAILT ROUTINE */
+
+        .spatial-progress {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            color: #4c4c4c;
+
+            text-align: center;
+        }
+
+        /* SPATIAL CONFIRMATION COMPLETE SCREEN */
+
+        #spatialCompleteScreen {
+            gap: 45px;
+        }
+
+        .complete-text {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: clamp(19px, 2.5vw, 26px);
+
+            font-weight: bold;
+
+            color: #4c4c4c;
+
+            text-align: center;
+
+            line-height: 1.6;
+        }
+
+        .saved-list {
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: clamp(18px, 2.5vw, 24px);
+
+            font-weight: bold;
+
+            color: #0788d1;
+
+            line-height: 1.8;
+
+            text-align: center;
+        }
+
+        /* INFO SCREEN */
+
+        #infoScreen {
+
+            gap: 30px;
+
+            overflow-y: auto;
+
+            justify-content: flex-start;
+
+            padding-top: 55px;
+            padding-bottom: 55px;
+        }
+
+        .info-title {
+
+            color: #ff5757;
+
+            font-size: clamp(55px, 7vw, 90px);
+
+            text-align: center;
+        }
+
+        .info-card {
+
+            width: min(850px, 90%);
+
+            background: #ffc42c;
+
+            border-radius: 60px;
+
+            padding: 45px 55px;
+
+            color: #4c4c4c;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            font-size: clamp(18px, 2.5vw, 26px);
+
+            font-weight: 600;
+
+            line-height: 1.6;
+        }
+
+        .info-card p {
+            margin-bottom: 25px;
+        }
+
+        .info-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .back-button {
+
+            border: none;
+
+            border-radius: 35px;
+
+            padding: 18px 55px;
+
+            background: #0788d1;
+
+            color: white;
+
+            font-family: inherit;
+
+            font-size: 30px;
+
+            cursor: pointer;
+
+            transition: transform 0.15s ease;
+        }
+
+        .back-button:hover {
+            transform: scale(1.05);
+        }
+
+/* PATIENT CAMERA & AI GUIDING CAPTIONS */
+
+#patientGuideScreen {
+    justify-content: flex-start;
+    padding: 48px;
+    overflow: hidden;
+}
+
+.guide-layout {
+    width: min(1200px, 100%);
+    height: calc(100vh - 96px);
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 0.9fr)
+        minmax(320px, 1.35fr);
+
+    grid-template-rows:
+        minmax(250px, 1fr)
+        minmax(180px, 0.7fr);
+
+    gap: 28px;
+}
+
+/* CAMERA IN THE CORNER */
+
+.camera-card {
+    position: relative;
+
+    overflow: hidden;
+
+    border-radius: 60px;
+
+    background: #cbd4dc;
+
+    min-height: 0;
+}
+
+#patientCamera {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    transform: scaleX(-1);
+}
+
+.camera-placeholder {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 30px;
+
+    text-align: center;
+
+    color: #626262;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-weight: 700;
+
+    font-size: 20px;
+
+    background: #cbd4dc;
+}
+
+.camera-placeholder.hidden {
+    display: none;
+}
+
+/* TIME & LOCATION IN THE PAITENT SCREEN */
+
+.guide-info {
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: flex-end;
+
+    text-align: right;
+
+    min-width: 0;
+}
+
+.guide-time {
+    color: #ffc226;
+
+    font-size:
+        clamp(70px, 10vw, 145px);
+
+    line-height: 0.85;
+}
+
+.guide-location {
+    color: #ffc226;
+
+    font-size:
+        clamp(38px, 6vw, 78px);
+
+    line-height: 0.95;
+
+    margin-top: 22px;
+}
+
+.guide-distance {
+    color: white;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size:
+        clamp(18px, 2vw, 26px);
+
+    font-weight: 700;
+
+    margin-top: 15px;
+}
+
+/* CAPTIONS OF THE AI GUIDE */
+
+.caption-card {
+    grid-column: 1 / 3;
+
+    border-radius: 60px;
+
+    background: #cbd4dc;
+
+    padding: 34px 45px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+
+    min-height: 0;
+}
+
+.ai-label {
+    color: #0788d1;
+
+    font-size:
+        clamp(20px, 2.4vw, 30px);
+
+    margin-bottom: 12px;
+}
+
+.ai-caption {
+    color: #4c4c4c;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size:
+        clamp(25px, 3.7vw, 48px);
+
+    line-height: 1.25;
+
+    font-weight: 800;
+}
+
+/* CONTROLS */
+
+.guide-controls {
+    display: flex;
+
+    gap: 14px;
+
+    margin-top: 20px;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+}
+
+.guide-control-button {
+    border: none;
+
+    border-radius: 30px;
+
+    padding: 13px 25px;
+
+    background: #0788d1;
+
+    color: #ffc42c;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    font-size: 18px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: transform 0.15s ease;
+}
+
+.guide-control-button:hover {
+    transform: scale(1.03);
+}
+
+/* PATIENT VIEW */
+
+@media (max-width: 750px) {
+
+    #patientGuideScreen {
+        padding: 22px;
+
+        overflow-y: auto;
+    }
+
+    .guide-layout {
+        height: auto;
+
+        min-height:
+            calc(100vh - 44px);
+
+        grid-template-columns:
+            1fr 1fr;
+
+        grid-template-rows:
+            250px auto auto;
+
+        gap: 18px;
+    }
+
+    .camera-card {
+        border-radius: 40px;
+    }
+
+    .guide-time {
+        font-size:
+            clamp(52px, 15vw, 90px);
+    }
+
+    .guide-location {
+        font-size:
+            clamp(28px, 8vw, 48px);
+    }
+
+    .caption-card {
+        grid-column: 1 / 3;
+
+        border-radius: 40px;
+
+        padding: 28px 22px;
+
+        min-height: 230px;
+    }
+
+}
+        /*  HELP CONTACT FOR CARETAKER */
+
+        @media (max-width: 650px) {
+
+            .screen {
+                padding: 30px 18px;
+            }
+
+
+            .phone-heading-row,
+            .spatial-heading-row {
+                gap: 10px;
+            }
+
+
+            .help-button {
+
+                width: 55px;
+
+                height: 55px;
+
+                font-size: 24px;
+            }
+
+
+            .phone-box,
+            .spatial-box {
+
+                min-height: 280px;
+
+                border-radius: 55px;
+
+                padding: 30px 20px;
+            }
+
+
+            .phone-input {
+
+                width: 100%;
+
+                padding: 20px;
+
+                border-radius: 25px;
+            }
+
+
+            .set-location-button {
+
+                width: 90%;
+
+                min-height: 95px;
+            }
+
+
+            .tooltip {
+
+                width: 250px;
+
+                left: auto;
+
+                right: -10px;
+
+                transform: translateY(10px);
+            }
+
+
+            .tooltip.show,
+            .help-container:hover .tooltip,
+            .help-button:focus + .tooltip {
+
+                transform: translateY(0);
+            }
+
+
+            .tooltip::after {
+
+                left: auto;
+
+                right: 18px;
+
+                transform: none;
+            }
+
+
+            .info-card {
+
+                padding: 30px 25px;
+
+                border-radius: 40px;
+            }
+
+        }
+
+
+    
+
+/* RESIDENT SCHEDULE SETUP*/
+#scheduleScreen { padding: 35px 20px; overflow-y: auto; }
+.schedule-wrap { width: min(950px, 94vw); margin: auto; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.schedule-title { color: #ffc226; font-size: clamp(44px, 7vw, 86px); line-height: .95; text-align: center; margin: 0; }
+.schedule-subtitle { color: white; font-family: Arial, Helvetica, sans-serif; font-weight: 700; font-size: 20px; text-align: center; max-width: 720px; margin: 0 0 5px; }
+.schedule-list { width: 100%; display: flex; flex-direction: column; gap: 12px; }
+.schedule-row { display: grid; grid-template-columns: 170px 1fr 54px; gap: 12px; align-items: center; background: #cbd4dc; padding: 14px; border-radius: 28px; }
+.schedule-time, .schedule-activity { width: 100%; box-sizing: border-box; border: 3px solid transparent; border-radius: 18px; padding: 14px 16px; font-family: Arial, Helvetica, sans-serif; font-size: 19px; font-weight: 700; color: #4c4c4c; background: white; outline: none; }
+.schedule-time:focus, .schedule-activity:focus { border-color: #0788d1; }
+.schedule-delete { width: 48px; height: 48px; border: none; border-radius: 50%; background: #ff5757; color: white; font-size: 26px; font-weight: 900; cursor: pointer; }
+.schedule-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.schedule-add { border: none; border-radius: 50%; width: 58px; height: 58px; background: #ffc226; color: #626262; font-size: 38px; font-weight: 900; line-height: 1; cursor: pointer; }
+.schedule-continue { border: none; border-radius: 30px; padding: 15px 30px; background: #0788d1; color: #ffc42c; font-family: Arial, Helvetica, sans-serif; font-size: 20px; font-weight: 900; cursor: pointer; }
+.schedule-note { color: white; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; text-align: center; min-height: 20px; }
+@media (max-width: 650px) { .schedule-row { grid-template-columns: 1fr 54px; } .schedule-time { grid-column: 1 / 2; } .schedule-activity { grid-column: 1 / 2; } .schedule-delete { grid-column: 2; grid-row: 1 / 3; align-self: center; } }
+
+    
+
+/* PATIENT EMERGENCY HELP BUTTON */
+.patient-help-button {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 68px;
+    height: 68px;
+    border: 4px solid white;
+    border-radius: 50%;
+    background: #ff5757;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 30;
+    box-shadow: 0 5px 15px rgba(0,0,0,.28);
+}
+.patient-help-button:hover { transform: scale(1.07); }
+.patient-help-button:active { transform: scale(.95); }
+
+    </style>
+
+
+    <!-- Browser-based object recognition -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+
+</head>
+
+
+
+<body>
+    <!-- MAIN HTML section -->
+
+
+    <!-- SCREEN 1: WELCOME -->
+
+    <main
+        class="screen"
+        id="welcomeScreen"
+    >
+
+        <h1 class="logo">
+            Recollective
+        </h1>
+
+        <h2 class="subtitle">
+            caretaker mode
+        </h2>
+
+        <button
+            class="location-button"
+            id="locationButton"
+            onclick="enableLocation()"
+        >
+            turn on location services to begin
+        </button>
+
+        <button
+            class="info-button"
+            onclick="showInfo()"
+        >
+            info
+        </button>
+
+    </main>
+
+    <!-- SCREEN 2: PHONE NUMBER -->
+
+    <main
+        class="screen hidden"
+        id="phoneScreen"
+    >
+        <div class="phone-heading-row">
+            <h1 class="phone-title">
+                Enter Phone Number
+            </h1>
+            <div class="help-container">
+                <button
+                    class="help-button"
+                    type="button"
+                    aria-label="Why do we need your phone number?"
+                    onclick="toggleTooltip('helpTooltip', event)"
+                >
+                    ?
+                </button>
+                <div
+                    class="tooltip"
+                    id="helpTooltip"
+                >
+                    This number connects you to the patient.
+
+                    If they need assistance, they can press
+                    the Help button in their Recollective
+                    patient view to request help from you.
+
+                </div>
+            </div>
+        </div>
+
+        <div class="phone-box">
+            <input
+                type="tel"
+                id="phoneInput"
+                class="phone-input"
+
+                placeholder="(613) 555-1234"
+
+                inputmode="tel"
+
+                autocomplete="tel"
+
+                maxlength="16"
+
+                aria-label="Caretaker phone number"
+            >
+            <div
+                class="validation-message"
+                id="validationMessage"
+            ></div>
+            <button
+                class="continue-button"
+                id="continueButton"
+                onclick="savePhoneNumber()"
+            >
+                continue
+            </button>
+        </div>
+    </main>
+
+    <!-- SCREEN 3: SPATIAL FEATURE -->
+
+    <main
+        class="screen hidden"
+        id="spatialScreen"
+    >
+        <div class="spatial-heading-row">
+
+            <h1 class="spatial-title">
+                Set-up Spatial Feature
+            </h1>
+            <div class="help-container">
+
+                <button
+                    class="help-button"
+                    type="button"
+                    aria-label="What is the spatial feature?"
+                    onclick="toggleTooltip('spatialTooltip', event)"
+                >
+                    ?
+                </button>
+                <div
+                    class="tooltip"
+                    id="spatialTooltip"
+                >
+
+                    The Spatial Feature helps guide the
+                    patient through their living space if
+                    they become confused or forget how to
+                    get somewhere.
+
+                    Important locations around their home
+                    can be saved so Recollective can help
+                    guide them throughout the day.
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="spatial-box">
+
+            <p
+                class="spatial-progress"
+                id="spatialProgress"
+            >
+                Location 1 of 5
+            </p>
+
+            <h2
+                class="spatial-instruction"
+                id="spatialInstruction"
+            >
+                Walk to main door
+            </h2>
+            <button
+                class="set-location-button"
+                id="setSpatialButton"
+                onclick="setCurrentLocation()"
+            >
+                Set as main door
+            </button>
+
+            <p
+                class="spatial-status"
+                id="spatialStatus"
+            ></p>
+
+        </div>
+
+    </main>
+
+    <!-- SCREEN 4: SPATIAL COMPLETE -->
+
+    <main
+        class="screen hidden"
+        id="spatialCompleteScreen"
+    >
+        <h1 class="spatial-title">
+            Setup Complete!
+        </h1>
+        <div class="spatial-box">
+            <h2 class="spatial-instruction">
+                Locations Saved
+            </h2>
+            <p class="complete-text">
+
+                Recollective now has the important
+                locations needed for the Spatial Feature.
+
+            </p>
+            <div class="saved-list">
+
+                ✓ Main Door<br>
+
+                ✓ Bathroom<br>
+
+                ✓ Kitchen<br>
+
+                ✓ Closet<br>
+
+                ✓ Bedroom
+
+            </div>
+<button
+    class="set-location-button"
+    onclick="openScheduleSetup()"
+>
+    Set Resident Schedule
+</button>
+
+        </div>
+
+    </main>
+
+<!-- PATIENT SCHEDULE SETUP -->
+<main class="screen hidden" id="scheduleScreen">
+    <div class="schedule-wrap">
+        <h1 class="schedule-title">Resident Schedule</h1>
+        <p class="schedule-subtitle">Add only the activities this resident should be reminded about. Activities are automatically sorted by time.</p>
+        <div class="schedule-list" id="scheduleList"></div>
+        <div class="schedule-actions">
+            <button class="schedule-add" type="button" onclick="addScheduleItem()" aria-label="Add schedule item">+</button>
+            <button class="schedule-continue" type="button" onclick="saveScheduleAndStartPatientView()">Save Schedule &amp; Start Patient View</button>
+        </div>
+        <div class="schedule-note" id="scheduleNote"></div>
+    </div>
+</main>
+
+<!-- PATIENT CAMERA & AI GUIDE -->
+
+<main
+    class="screen hidden"
+    id="patientGuideScreen"
+>
+    <div class="guide-layout">
+
+        <!-- CAMERA -->
+        <div class="camera-card">
+            <video
+                id="patientCamera"
+                autoplay
+                playsinline
+                muted
+            ></video>
+            <div
+                class="camera-placeholder"
+                id="cameraPlaceholder"
+            >
+
+                Allow camera access to begin
+                the visual guide.
+
+            </div>
+
+            <button
+                class="patient-help-button"
+                type="button"
+                onclick="requestCaretakerHelp()"
+                aria-label="Contact caregiver for help"
+                title="Contact caregiver"
+            >!</button>
+        </div>
+        <!-- TIME & LOCATION -->
+
+        <div class="guide-info">
+
+            <div
+                class="guide-time"
+                id="guideTime"
+            >
+                --:--
+            </div>
+
+            <div
+                class="guide-location"
+                id="guideLocation"
+            >
+                finding location...
+            </div>
+
+            <div
+                class="guide-distance"
+                id="guideDistance"
+            >
+                Comparing your position
+                with saved landmarks
+            </div>
+
+        </div>
+
+        <!-- AI CAPTIONS -->
+
+        <div class="caption-card">
+
+            <div class="ai-label">
+                RECOLLECTIVE GUIDE
+            </div>
+            <div
+                class="ai-caption"
+                id="aiCaption"
+                aria-live="polite"
+            >
+
+                I am finding where you are.
+                Stay where you are for a moment.
+
+            </div>
+
+            <div class="guide-controls">
+
+                <button
+                    class="guide-control-button"
+                    onclick="repeatGuidance()"
+                >
+                    Repeat
+                </button>
+
+                <button
+                    class="guide-control-button"
+                    onclick="updatePatientLocation(true)"
+                >
+                    Check Location
+                </button>
+
+                <button
+                    class="guide-control-button"
+                    id="recognizeObjectButton"
+                    onclick="recognizeHeldObject()"
+                >
+                    Recognize Object
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+    <!-- INFORMATION SCREEN -->
+
+    <main
+        class="screen hidden"
+        id="infoScreen"
+    >
+
+        <h1 class="info-title">
+            About Recollective
+        </h1>
+
+        <div class="info-card">
+
+            <p>
+
+                Recollective is a website designed to
+                improve the day-to-day lives of dementia
+                patients.
+
+            </p>
+
+
+            <p>
+
+                With the implementation of AI camera
+                recognition and location tracking,
+                Recollective aims to direct the
+                "Perfect Day" for individuals with
+                dementia.
+
+            </p>
+
+
+            <p>
+
+                Start by having the caretaker enter
+                general information regarding scheduling
+                specifications and location landmarks.
+
+            </p>
+
+
+        </div>
+
+
+        <button
+            class="back-button"
+            onclick="closeInfo()"
+        >
+            back
+        </button>
+
+
+    </main>
+
+<!-- JAVASCRIPT section below  -->
+
+    <script>
+
+let currentUserLatitude = null;
+let currentUserLongitude = null;
+let locationWatchId = null;
+        /* LOCATION */
+
+function enableLocation() {
+
+    const button =
+        document.getElementById("locationButton");
+
+    if (!navigator.geolocation) {
+
+        button.textContent =
+            "location is not supported on this device";
+
+        return;
+    }
+
+    button.textContent =
+        "turning on location...";
+
+    navigator.geolocation.getCurrentPosition(
+
+        function(position) {
+
+            currentUserLatitude =
+                position.coords.latitude;
+
+            currentUserLongitude =
+                position.coords.longitude;
+
+
+            localStorage.setItem(
+                "latitude",
+                currentUserLatitude
+            );
+
+            localStorage.setItem(
+                "longitude",
+                currentUserLongitude
+            );
+
+            button.textContent =
+                "✓ location enabled";
+
+            /* Start continuously tracking location with that thing below */
+
+            startLocationTracking();
+
+
+            setTimeout(function() {
+
+                transitionToPhoneScreen();
+
+            }, 500);
+
+        },
+
+        function() {
+
+            button.textContent =
+                "location permission needed — tap to try again";
+
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 5000
+        }
+
+    );
+}
+
+function startLocationTracking() {
+
+    if (!navigator.geolocation) {
+        return;
+    }
+
+    if (locationWatchId !== null) {
+        return;
+    }
+
+    locationWatchId =
+        navigator.geolocation.watchPosition(
+
+            function(position) {
+
+                currentUserLatitude =
+                    position.coords.latitude;
+
+                currentUserLongitude =
+                    position.coords.longitude;
+
+
+                localStorage.setItem(
+                    "latitude",
+                    currentUserLatitude
+                );
+
+                localStorage.setItem(
+                    "longitude",
+                    currentUserLongitude
+                );
+
+            },
+
+            function(error) {
+
+                console.log(
+                    "Location tracking error:",
+                    error
+                );
+
+            },
+
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 10000
+            }
+
+        );
+}
+
+        /* WELCOME -> PHONE TRANSITON */
+
+        function transitionToPhoneScreen() {
+
+
+            const welcome =
+                document.getElementById(
+                    "welcomeScreen"
+                );
+
+
+            const phone =
+                document.getElementById(
+                    "phoneScreen"
+                );
+
+
+            welcome.classList.add(
+                "hidden"
+            );
+
+
+            setTimeout(function() {
+
+
+                phone.classList.remove(
+                    "hidden"
+                );
+
+
+            }, 180);
+
+
+        }
+
+
+
+        /* PHONE -> SPATIAL */
+
+        function transitionToSpatialScreen() {
+
+
+            const phone =
+                document.getElementById(
+                    "phoneScreen"
+                );
+
+
+            const spatial =
+                document.getElementById(
+                    "spatialScreen"
+                );
+
+
+            phone.classList.add(
+                "hidden"
+            );
+
+
+            setTimeout(function() {
+
+
+                spatial.classList.remove(
+                    "hidden"
+                );
+
+
+            }, 180);
+
+
+        }
+
+        /* INFO */
+
+        function showInfo() {
+
+
+            const welcome =
+                document.getElementById(
+                    "welcomeScreen"
+                );
+
+
+            const info =
+                document.getElementById(
+                    "infoScreen"
+                );
+
+
+            welcome.classList.add(
+                "hidden"
+            );
+
+
+            setTimeout(function() {
+
+
+                info.classList.remove(
+                    "hidden"
+                );
+
+
+            }, 180);
+
+
+        }
+
+        function closeInfo() {
+
+            const welcome =
+                document.getElementById(
+                    "welcomeScreen"
+                );
+
+            const info =
+                document.getElementById(
+                    "infoScreen"
+                );
+
+            info.classList.add(
+                "hidden"
+            );
+
+            setTimeout(function() {
+
+                welcome.classList.remove(
+                    "hidden"
+                );
+
+            }, 180);
+
+
+        }
+
+        /* TOOLTIPS */
+
+        function toggleTooltip(
+            tooltipId,
+            event
+        ) {
+
+            event.stopPropagation();
+
+            const tooltip =
+                document.getElementById(
+                    tooltipId
+                );
+
+            document
+                .querySelectorAll(".tooltip")
+                .forEach(function(item) {
+
+                    if (item !== tooltip) {
+
+                        item.classList.remove(
+                            "show"
+                        );
+
+                    }
+
+                });
+
+            tooltip.classList.toggle(
+                "show"
+            );
+
+        }
+
+        document.addEventListener(
+            "click",
+            function(event) {
+                if (
+                    !event.target.closest(
+                        ".help-container"
+                    )
+                ) {
+                    document
+                        .querySelectorAll(
+                            ".tooltip"
+                        )
+                        .forEach(
+                            function(tooltip) {
+
+
+                                tooltip.classList.remove(
+                                    "show"
+                                );
+
+
+                            }
+                        );
+
+                }
+
+            }
+        );
+
+        /* PHONE NUMBER */
+
+        const phoneInput =
+            document.getElementById(
+                "phoneInput"
+            );
+
+
+        const validationMessage =
+            document.getElementById(
+                "validationMessage"
+            );
+
+
+        const continueButton =
+            document.getElementById(
+                "continueButton"
+            );
+
+
+
+        phoneInput.addEventListener(
+            "input",
+            function() {
+
+
+                let numbers =
+                    phoneInput.value.replace(
+                        /\D/g,
+                        ""
+                    );
+
+
+                numbers =
+                    numbers.substring(
+                        0,
+                        10
+                    );
+
+
+
+                if (
+                    numbers.length > 6
+                ) {
+
+
+                    phoneInput.value =
+
+                        "(" +
+
+                        numbers.substring(
+                            0,
+                            3
+                        ) +
+
+                        ") " +
+
+                        numbers.substring(
+                            3,
+                            6
+                        ) +
+
+                        "-" +
+
+                        numbers.substring(
+                            6,
+                            10
+                        );
+
+
+                }
+
+
+                else if (
+                    numbers.length > 3
+                ) {
+
+
+                    phoneInput.value =
+
+                        "(" +
+
+                        numbers.substring(
+                            0,
+                            3
+                        ) +
+
+                        ") " +
+
+                        numbers.substring(
+                            3
+                        );
+
+
+                }
+
+
+                else if (
+                    numbers.length > 0
+                ) {
+
+
+                    phoneInput.value =
+                        "(" + numbers;
+
+
+                }
+
+
+                else {
+
+
+                    phoneInput.value =
+                        "";
+
+
+                }
+
+
+                validatePhone(
+                    numbers
+                );
+
+
+            }
+        );
+
+
+
+        /* PHONE VALIDATION */
+
+        function validatePhone(numbers) {
+
+
+            if (
+                numbers.length === 0
+            ) {
+
+
+                phoneInput.classList.remove(
+                    "valid",
+                    "invalid"
+                );
+
+
+                validationMessage.textContent =
+                    "";
+
+
+                continueButton.classList.remove(
+                    "enabled"
+                );
+
+
+                return;
+
+
+            }
+
+
+
+            if (
+                numbers.length === 10
+            ) {
+
+
+                phoneInput.classList.remove(
+                    "invalid"
+                );
+
+
+                phoneInput.classList.add(
+                    "valid"
+                );
+
+
+                validationMessage.textContent =
+                    "";
+
+
+                continueButton.classList.add(
+                    "enabled"
+                );
+
+
+            }
+
+            else {
+
+
+                phoneInput.classList.remove(
+                    "valid"
+                );
+
+
+                phoneInput.classList.add(
+                    "invalid"
+                );
+
+
+                validationMessage.textContent =
+                    "Please enter a 10-digit phone number.";
+
+
+                continueButton.classList.remove(
+                    "enabled"
+                );
+
+
+            }
+
+
+        }
+
+
+        /* SAVE PHONE */
+
+        function savePhoneNumber() {
+
+
+            const numbers =
+                phoneInput.value.replace(
+                    /\D/g,
+                    ""
+                );
+
+
+            if (
+                numbers.length !== 10
+            ) {
+
+
+                return;
+
+
+            }
+
+
+            localStorage.setItem(
+                "caretakerPhone",
+                numbers
+            );
+
+
+            transitionToSpatialScreen();
+
+
+        }
+
+        /* SPATIAL LOCATIONS */
+
+        const spatialLocations = [
+
+
+            {
+                name: "main door",
+                key: "mainDoor"
+            },
+
+
+            {
+                name: "bathroom",
+                key: "bathroom"
+            },
+
+
+            {
+                name: "kitchen",
+                key: "kitchen"
+            },
+
+
+            {
+                name: "closet",
+                key: "closet"
+            },
+
+
+            {
+                name: "bedroom",
+                key: "bedroom"
+            }
+
+
+        ];
+
+
+        let currentSpatialLocation = 0;
+
+        /* SET CURRENT LOCATION */
+
+function setCurrentLocation() {
+
+    const button =
+        document.getElementById(
+            "setSpatialButton"
+        );
+
+    const status =
+        document.getElementById(
+            "spatialStatus"
+        );
+
+    const instruction =
+        document.getElementById(
+            "spatialInstruction"
+        );
+
+    const progress =
+        document.getElementById(
+            "spatialProgress"
+        );
+
+    const location =
+        spatialLocations[
+            currentSpatialLocation
+        ];
+
+
+    if (
+        currentUserLatitude === null ||
+        currentUserLongitude === null
+    ) {
+
+        status.textContent =
+            "Waiting for your location...";
+
+        return;
+    }
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Setting location...";
+
+    status.textContent =
+        "Stay near the " +
+        location.name;
+
+    localStorage.setItem(
+
+        location.key + "Latitude",
+
+        currentUserLatitude
+
+    );
+
+
+    localStorage.setItem(
+
+        location.key + "Longitude",
+
+        currentUserLongitude
+
+    );
+
+
+    button.textContent =
+        "✓ " +
+        capitalizeWords(location.name) +
+        " set";
+
+
+    status.textContent =
+        capitalizeWords(location.name) +
+        " successfully saved";
+
+
+    /* Move to next landmark */
+
+    setTimeout(function() {
+
+        currentSpatialLocation++;
+
+        if (
+            currentSpatialLocation >=
+            spatialLocations.length
+        ) {
+
+            showSpatialComplete();
+
+            return;
+        }
+
+
+        const nextLocation =
+            spatialLocations[
+                currentSpatialLocation
+            ];
+
+
+        instruction.textContent =
+            "Walk to " +
+            nextLocation.name;
+
+
+        button.textContent =
+            "Set as " +
+            nextLocation.name;
+
+
+        progress.textContent =
+
+            "Location " +
+
+            (currentSpatialLocation + 1) +
+
+            " of " +
+
+            spatialLocations.length;
+
+
+        status.textContent = "";
+
+
+        button.disabled = false;
+
+    }, 1000);
+}
+
+        /* CAPITALIZE THINGS */
+
+        function capitalizeWords(text) {
+
+
+            return text.replace(
+
+                /\b\w/g,
+
+                function(letter) {
+
+
+                    return letter.toUpperCase();
+
+
+                }
+
+            );
+
+
+        }
+
+        /* SPATIAL COMPLETE */
+
+        function showSpatialComplete() {
+
+
+            const spatial =
+                document.getElementById(
+                    "spatialScreen"
+                );
+
+
+            const complete =
+                document.getElementById(
+                    "spatialCompleteScreen"
+                );
+
+
+            spatial.classList.add(
+                "hidden"
+            );
+
+
+            setTimeout(function() {
+                openScheduleSetup();
+            }, 180);
+
+
+        }
+
+/* CUSTOMIZABLE PAITIENT SCHEDULE */
+
+const RESIDENT_SCHEDULE_KEY = "residentSchedule";
+let scheduleAssistantInterval = null;
+let scheduleAssistantActive = false;
+let scheduleMessagePriorityUntil = 0;
+let lastScheduleReminderKey = "";
+
+function openScheduleSetup() {
+    document.getElementById("spatialScreen").classList.add("hidden");
+    document.getElementById("spatialCompleteScreen").classList.add("hidden");
+    const screen = document.getElementById("scheduleScreen");
+    screen.classList.remove("hidden");
+    renderScheduleEditor();
+}
+
+function loadResidentSchedule() {
+    try {
+        const saved = JSON.parse(localStorage.getItem(RESIDENT_SCHEDULE_KEY));
+        return Array.isArray(saved) ? saved : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveResidentSchedule(items) {
+    const clean = items
+        .filter(item => item.time && item.activity.trim())
+        .map(item => ({ id: item.id || (Date.now() + Math.random()), time: item.time, activity: item.activity.trim() }))
+        .sort((a, b) => a.time.localeCompare(b.time));
+    localStorage.setItem(RESIDENT_SCHEDULE_KEY, JSON.stringify(clean));
+    return clean;
+}
+
+function renderScheduleEditor() {
+    const list = document.getElementById("scheduleList");
+    list.innerHTML = "";
+    const items = loadResidentSchedule();
+    if (items.length === 0) {
+        createScheduleRow("", "");
+    } else {
+        items.forEach(item => createScheduleRow(item.time, item.activity, item.id));
+    }
+}
+
+function createScheduleRow(time = "", activity = "", id = "") {
+    const list = document.getElementById("scheduleList");
+    const row = document.createElement("div");
+    row.className = "schedule-row";
+    row.dataset.id = id || String(Date.now() + Math.random());
+    row.innerHTML = `
+        <input class="schedule-time" type="time" value="${escapeScheduleHtml(time)}" aria-label="Activity time">
+        <input class="schedule-activity" type="text" value="${escapeScheduleHtml(activity)}" placeholder="What should the resident do?" aria-label="Activity">
+        <button class="schedule-delete" type="button" aria-label="Delete activity">×</button>
+    `;
+    row.querySelector(".schedule-delete").addEventListener("click", function() {
+        row.remove();
+        if (!list.children.length) createScheduleRow();
+        sortScheduleRows();
+    });
+    row.querySelector(".schedule-time").addEventListener("change", sortScheduleRows);
+    list.appendChild(row);
+}
+
+function addScheduleItem() {
+    createScheduleRow();
+    const rows = document.querySelectorAll("#scheduleList .schedule-row");
+    rows[rows.length - 1].querySelector(".schedule-time").focus();
+}
+
+function sortScheduleRows() {
+    const list = document.getElementById("scheduleList");
+    const rows = Array.from(list.querySelectorAll(".schedule-row"));
+    rows.sort((a, b) => {
+        const at = a.querySelector(".schedule-time").value || "99:99";
+        const bt = b.querySelector(".schedule-time").value || "99:99";
+        return at.localeCompare(bt);
+    });
+    rows.forEach(row => list.appendChild(row));
+}
+
+function collectScheduleEditorItems() {
+    return Array.from(document.querySelectorAll("#scheduleList .schedule-row")).map(row => ({
+        id: row.dataset.id,
+        time: row.querySelector(".schedule-time").value,
+        activity: row.querySelector(".schedule-activity").value
+    }));
+}
+
+function saveScheduleAndStartPatientView() {
+    const rows = collectScheduleEditorItems();
+    const partiallyFilled = rows.some(item => (item.time && !item.activity.trim()) || (!item.time && item.activity.trim()));
+    const note = document.getElementById("scheduleNote");
+    if (partiallyFilled) {
+        note.textContent = "Please give every activity both a time and a description.";
+        return;
+    }
+    const saved = saveResidentSchedule(rows);
+    note.textContent = saved.length ? "Schedule saved." : "No activities were added. The resident will not receive schedule reminders.";
+    setTimeout(openPatientGuide, 250);
+}
+
+function escapeScheduleHtml(value) {
+    return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+}
+
+function startScheduleAssistant() {
+    scheduleAssistantActive = true;
+    if (scheduleAssistantInterval) clearInterval(scheduleAssistantInterval);
+    checkResidentSchedule();
+    scheduleAssistantInterval = setInterval(checkResidentSchedule, 10000);
+}
+
+function checkResidentSchedule() {
+    const schedule = loadResidentSchedule();
+    if (!schedule.length) {
+        scheduleMessagePriorityUntil = Date.now() + 12000;
+        showScheduleCaption("There are no scheduled activities right now.");
+        return;
+    }
+
+    const now = new Date();
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+    let due = null;
+    let next = null;
+    let nextDiff = Infinity;
+
+    schedule.forEach(item => {
+        const parts = item.time.split(":");
+        const itemMinutes = Number(parts[0]) * 60 + Number(parts[1]);
+        const diff = itemMinutes - currentMinutes;
+        if (diff <= 0 && diff >= -2) due = item;
+        if (diff > 0 && diff < nextDiff) { next = item; nextDiff = diff; }
+    });
+
+    if (due) {
+        const reminderKey = `${today}|${due.id}|${due.time}`;
+        const message = `It is ${formatResidentTime(due.time)}. Your schedule says it is time to ${normalizeActivity(due.activity)}.`;
+        scheduleMessagePriorityUntil = Date.now() + 180000;
+        showScheduleCaption(message);
+        if (lastScheduleReminderKey !== reminderKey) {
+            lastScheduleReminderKey = reminderKey;
+            speakGuidance(message);
+        }
+        return;
+    }
+
+    scheduleMessagePriorityUntil = Date.now() + 12000;
+    if (next) {
+        const message = nextDiff <= 15
+            ? `Coming up in ${nextDiff} minute${nextDiff === 1 ? "" : "s"}: ${next.activity} at ${formatResidentTime(next.time)}.`
+            : `Next on your schedule: ${next.activity} at ${formatResidentTime(next.time)}.`;
+        showScheduleCaption(message);
+    } else {
+        showScheduleCaption("You have no more scheduled activities today.");
+    }
+}
+
+function showScheduleCaption(message) {
+    lastGuidanceText = message;
+    const caption = document.getElementById("aiCaption");
+    if (caption) caption.textContent = message;
+}
+
+function formatResidentTime(time) {
+    const [h, m] = time.split(":").map(Number);
+    const period = h >= 12 ? "PM" : "AM";
+    const hour = h % 12 || 12;
+    return `${hour}:${String(m).padStart(2, "0")} ${period}`;
+}
+
+function normalizeActivity(activity) {
+    let text = String(activity).trim();
+    if (!text) return "follow your scheduled activity";
+    text = text.charAt(0).toLowerCase() + text.slice(1);
+    return text.replace(/[.!?]+$/, "");
+}
+
+        /* PATIENT CAMERA + RECOLLECTIVE GUIDE */
+
+let patientCameraStream = null;
+
+let lastGuidanceText = "";
+
+let patientLocationWatchId = null;
+
+let guideClockInterval = null;
+
+
+
+/* OPEN PATIENT VIEW */
+
+function openPatientGuide() {
+
+
+    const complete = document.getElementById("spatialCompleteScreen");
+    const scheduleScreen = document.getElementById("scheduleScreen");
+
+
+    const guide =
+        document.getElementById(
+            "patientGuideScreen"
+        );
+
+
+    complete.classList.add("hidden");
+    scheduleScreen.classList.add("hidden");
+
+
+    setTimeout(function() {
+
+
+        guide.classList.remove(
+            "hidden"
+        );
+
+
+        startPatientCamera();
+
+        // Begin loading object recognition in the background so the button is faster.
+        loadObjectRecognitionModel().catch(error => console.warn("Object model preload:", error));
+
+
+        startGuideClock();
+
+
+        startPatientLocationTracking();
+
+        startScheduleAssistant();
+
+
+        speakGuidance(
+
+            "Welcome. I am your Recollective guide. " +
+
+            "I will help you with your daily tasks. If you need immediate help, press the big red button to contact your caregiver."
+
+        );
+
+
+    }, 180);
+
+
+}
+
+/* OBJECT RECOGNITION */
+
+let recollectiveObjectModel = null;
+let recollectiveObjectModelLoading = false;
+
+async function loadObjectRecognitionModel() {
+    if (recollectiveObjectModel) return recollectiveObjectModel;
+    if (recollectiveObjectModelLoading) {
+        while (recollectiveObjectModelLoading) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        return recollectiveObjectModel;
+    }
+
+    recollectiveObjectModelLoading = true;
+    try {
+        if (typeof cocoSsd === "undefined") {
+            throw new Error("Object recognition library did not load.");
+        }
+        recollectiveObjectModel = await cocoSsd.load({ base: "lite_mobilenet_v2" });
+        return recollectiveObjectModel;
+    } finally {
+        recollectiveObjectModelLoading = false;
+    }
+}
+
+async function recognizeHeldObject() {
+    const video = document.getElementById("patientCamera");
+    const button = document.getElementById("recognizeObjectButton");
+
+    if (!video || !video.srcObject || video.readyState < 2) {
+        const message = "I cannot see through the camera yet. Please wait a moment and try again.";
+        showScheduleCaption(message);
+        speakGuidance(message);
+        return;
+    }
+
+    const originalText = button ? button.textContent : "Recognize Object";
+    if (button) {
+        button.disabled = true;
+        button.textContent = "Looking...";
+    }
+
+    scheduleMessagePriorityUntil = Date.now() + 12000;
+    showScheduleCaption("Hold the object clearly in front of the camera. I am looking at it now...");
+
+    try {
+        const model = await loadObjectRecognitionModel();
+        const predictions = await model.detect(video, 12, 0.35);
+
+        const objects = predictions
+            .filter(item => item.class !== "person")
+            .sort((a, b) => b.score - a.score);
+
+        if (!objects.length) {
+            const message = "I am not sure what you are holding. Try moving the object closer to the camera with good lighting.";
+            showScheduleCaption(message);
+            speakGuidance(message);
+            return;
+        }
+
+        const vw = video.videoWidth || video.clientWidth || 1;
+        const vh = video.videoHeight || video.clientHeight || 1;
+        const cx = vw / 2;
+        const cy = vh / 2;
+
+        objects.forEach(item => {
+            const [x, y, w, h] = item.bbox;
+            const ox = x + w / 2;
+            const oy = y + h / 2;
+            const distance = Math.hypot((ox - cx) / vw, (oy - cy) / vh);
+            item.recollectiveRank = item.score - (distance * 0.30);
+        });
+
+        objects.sort((a, b) => b.recollectiveRank - a.recollectiveRank);
+        const best = objects[0];
+        const confidence = Math.round(best.score * 100);
+        const article = /^[aeiou]/i.test(best.class) ? "an" : "a";
+
+        let message;
+        if (best.score >= 0.70) {
+            message = `It looks like you are holding ${article} ${best.class}.`;
+        } else {
+            message = `I think you may be holding ${article} ${best.class}.`;
+        }
+
+        console.log("Recollective object detection:", best.class, confidence + "%", predictions);
+        scheduleMessagePriorityUntil = Date.now() + 15000;
+        showScheduleCaption(message);
+        speakGuidance(message);
+    } catch (error) {
+        console.error("Object recognition error:", error);
+        const message = "Object recognition is not available right now. Please check the internet connection and try again.";
+        showScheduleCaption(message);
+        speakGuidance(message);
+    } finally {
+        if (button) {
+            button.disabled = false;
+            button.textContent = originalText;
+        }
+    }
+}
+
+/* CAMERA */
+
+async function startPatientCamera() {
+
+
+    const video =
+        document.getElementById(
+            "patientCamera"
+        );
+
+
+    const placeholder =
+        document.getElementById(
+            "cameraPlaceholder"
+        );
+
+
+
+    if (
+        !navigator.mediaDevices ||
+        !navigator.mediaDevices.getUserMedia
+    ) {
+
+
+        placeholder.textContent =
+            "Camera is not supported in this browser.";
+
+
+        return;
+
+
+    }
+
+    try {
+
+
+        patientCameraStream =
+            await navigator.mediaDevices
+                .getUserMedia({
+
+                    video: {
+
+                        facingMode: "user"
+
+                    },
+
+                    audio: false
+
+                });
+
+
+
+        video.srcObject =
+            patientCameraStream;
+
+
+
+        placeholder.classList.add(
+            "hidden"
+        );
+
+
+    }
+
+
+    catch (error) {
+
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+
+        placeholder.textContent =
+            "Camera permission is needed to show the live camera.";
+
+
+    }
+
+
+}
+
+/* LIVE CLOCK */
+
+function startGuideClock() {
+
+
+    updateGuideClock();
+
+
+    if (guideClockInterval) {
+
+        clearInterval(
+            guideClockInterval
+        );
+
+    }
+
+    guideClockInterval =
+        setInterval(
+
+            updateGuideClock,
+
+            1000
+
+        );
+
+
+}
+
+function updateGuideClock() {
+
+
+    const now =
+        new Date();
+
+
+    document.getElementById(
+        "guideTime"
+    ).textContent =
+
+        now.toLocaleTimeString(
+
+            [],
+
+            {
+
+                hour: "numeric",
+
+                minute: "2-digit"
+
+            }
+
+        );
+
+
+}
+
+/* GET SAVED LANDMARKS */
+
+function getSavedLandmarks() {
+
+
+    const landmarks = [];
+
+
+
+    spatialLocations.forEach(
+
+        function(location) {
+
+
+            const latitude =
+                parseFloat(
+
+                    localStorage.getItem(
+
+                        location.key +
+                        "Latitude"
+
+                    )
+
+                );
+
+
+            const longitude =
+                parseFloat(
+
+                    localStorage.getItem(
+
+                        location.key +
+                        "Longitude"
+
+                    )
+
+                );
+
+
+
+            if (
+
+                Number.isFinite(
+                    latitude
+                ) &&
+
+                Number.isFinite(
+                    longitude
+                )
+
+            ) {
+
+
+                landmarks.push({
+
+                    name:
+                        location.name,
+
+                    latitude:
+                        latitude,
+
+                    longitude:
+                        longitude
+
+                });
+
+
+            }
+
+
+        }
+
+    );
+
+
+
+    return landmarks;
+
+
+}
+
+/* START LOCATION TRACKING */
+
+function startPatientLocationTracking() {
+
+
+    if (!navigator.geolocation) {
+
+
+        showGuideMessage(
+
+            "I cannot access location services on this device.",
+
+            true
+
+        );
+
+
+        return;
+
+
+    }
+
+    updatePatientLocation(
+        false
+    );
+
+    if (
+        patientLocationWatchId !== null
+    ) {
+
+        navigator.geolocation
+            .clearWatch(
+
+                patientLocationWatchId
+
+            );
+    }
+
+    patientLocationWatchId =
+
+        navigator.geolocation
+            .watchPosition(
+
+                function(position) {
+
+                    processPatientPosition(
+
+                        position,
+
+                        false
+
+                    );
+
+
+                },
+
+
+                function(error) {
+
+
+                    console.error(
+                        "Location error:",
+                        error
+                    );
+
+
+                    document.getElementById(
+                        "guideLocation"
+                    ).textContent =
+                        "location unavailable";
+
+
+                    document.getElementById(
+                        "guideDistance"
+                    ).textContent =
+                        "Please allow location access.";
+
+
+                },
+
+
+                {
+
+                    enableHighAccuracy: true,
+
+                    maximumAge: 2000,
+
+                    timeout: 10000
+
+                }
+
+
+            );
+
+
+}
+
+
+/* CHECK LOCATION MANUALLY */
+
+function updatePatientLocation(
+    speakResult
+) {
+
+
+    if (!navigator.geolocation) {
+
+        return;
+
+    }
+
+    document.getElementById(
+        "guideLocation"
+    ).textContent =
+        "finding location...";
+
+    document.getElementById(
+        "guideDistance"
+    ).textContent =
+        "Checking saved landmarks...";
+
+    navigator.geolocation
+        .getCurrentPosition(
+
+            function(position) {
+
+                processPatientPosition(
+
+                    position,
+
+                    speakResult
+
+                );
+
+
+            },
+
+
+            function(error) {
+
+
+                console.error(
+                    "Location error:",
+                    error
+                );
+
+
+                document.getElementById(
+                    "guideLocation"
+                ).textContent =
+                    "location unavailable";
+
+
+                document.getElementById(
+                    "guideDistance"
+                ).textContent =
+                    "Please allow location access.";
+
+
+                showGuideMessage(
+
+                    "I cannot determine your location. " +
+
+                    "Please make sure location services are allowed.",
+
+                    speakResult
+
+                );
+
+
+            },
+
+
+            {
+
+                enableHighAccuracy: true,
+
+                maximumAge: 0,
+
+                timeout: 10000
+
+            }
+
+
+        );
+
+
+}
+
+/* FIND CLOSEST LANDMARK */
+
+function processPatientPosition(
+    position,
+    speakResult
+) {
+
+
+    const landmarks =
+        getSavedLandmarks();
+
+
+
+    if (
+        landmarks.length === 0
+    ) {
+
+
+        document.getElementById(
+            "guideLocation"
+        ).textContent =
+            "no landmarks";
+
+
+        document.getElementById(
+            "guideDistance"
+        ).textContent =
+            "No saved home landmarks were found.";
+
+
+
+        showGuideMessage(
+
+            "I do not have any saved landmarks yet.",
+
+            speakResult
+
+        );
+
+
+        return;
+
+
+    }
+
+    const currentLatitude =
+        position.coords.latitude;
+
+
+    const currentLongitude =
+        position.coords.longitude;
+
+
+
+    let closestLandmark =
+        null;
+
+    landmarks.forEach(
+
+        function(landmark) {
+
+
+            const distance =
+
+                calculateDistanceMeters(
+
+                    currentLatitude,
+
+                    currentLongitude,
+
+                    landmark.latitude,
+
+                    landmark.longitude
+
+                );
+
+            if (
+
+                closestLandmark === null ||
+
+                distance <
+                closestLandmark.distance
+
+            ) {
+
+                closestLandmark = {
+
+                    name:
+                        landmark.name,
+
+                    distance:
+                        distance
+
+                };
+
+
+            }
+
+
+        }
+
+    );
+
+    const roundedDistance =
+
+        Math.max(
+
+            0,
+
+            Math.round(
+
+                closestLandmark.distance
+
+            )
+
+        );
+
+
+
+    document.getElementById(
+        "guideLocation"
+    ).textContent =
+
+        capitalizeWords(
+
+            closestLandmark.name
+
+        );
+
+    document.getElementById(
+        "guideDistance"
+    ).textContent =
+
+        "Closest saved landmark • about " +
+
+        roundedDistance +
+
+        " m away";
+
+
+
+    const guidance =
+
+        buildGuidance(
+
+            closestLandmark.name,
+
+            roundedDistance
+
+        );
+
+
+
+    if (!scheduleAssistantActive || Date.now() > scheduleMessagePriorityUntil) {
+        showGuideMessage(guidance, speakResult);
+    }
+
+
+}
+
+/* GUIDANCE */
+
+function buildGuidance(
+    landmarkName,
+    distance
+) {
+
+
+    if (
+        distance <= 5
+    ) {
+
+
+        return (
+
+            "You appear to be near the " +
+
+            landmarkName +
+
+            ". You are in a familiar area. " +
+
+            "I am here if you need help."
+
+        );
+
+
+    }
+
+    if (
+        distance <= 15
+    ) {
+        return (
+
+            "The closest saved landmark is the " +
+
+            landmarkName +
+
+            ", about " +
+
+            distance +
+
+            " metres away. " +
+
+            "Move carefully and look around " +
+
+            "for familiar surroundings."
+
+        );
+
+
+    }
+
+    return (
+
+        "The closest saved landmark is the " +
+
+        landmarkName +
+
+        ", about " +
+
+        distance +
+
+        " metres away. " +
+
+        "Stay where you feel safe while " +
+
+        "I keep checking your location."
+
+    );
+
+
+}
+
+/* DISTANCE CALCULATION */
+
+function calculateDistanceMeters(
+
+    latitude1,
+
+    longitude1,
+
+    latitude2,
+
+    longitude2
+
+) {
+
+
+    const earthRadius =
+        6371000;
+
+    function toRadians(
+        degrees
+    ) {
+        return (
+
+            degrees *
+
+            Math.PI /
+
+            180
+
+        );
+
+
+    }
+
+    const latitudeDifference =
+
+        toRadians(
+
+            latitude2 -
+            latitude1
+
+        );
+
+    const longitudeDifference =
+
+        toRadians(
+
+            longitude2 -
+            longitude1
+
+        );
+
+    const calculation =
+
+        Math.sin(
+            latitudeDifference / 2
+        ) *
+
+        Math.sin(
+            latitudeDifference / 2
+        ) +
+
+
+        Math.cos(
+            toRadians(
+                latitude1
+            )
+        ) *
+
+
+        Math.cos(
+            toRadians(
+                latitude2
+            )
+        ) *
+
+
+        Math.sin(
+            longitudeDifference / 2
+        ) *
+
+
+        Math.sin(
+            longitudeDifference / 2
+        );
+
+
+
+    const angle =
+
+        2 *
+
+        Math.atan2(
+
+            Math.sqrt(
+                calculation
+            ),
+
+            Math.sqrt(
+                1 - calculation
+            )
+
+        );
+
+
+
+    return (
+
+        earthRadius *
+        angle
+
+    );
+
+
+}
+
+
+
+/* UPDATE CAPTIONS*/
+
+function showGuideMessage(
+
+    message,
+
+    shouldSpeak
+
+) {
+
+
+    lastGuidanceText =
+        message;
+
+
+
+    document.getElementById(
+        "aiCaption"
+    ).textContent =
+        message;
+
+
+
+    if (shouldSpeak) {
+
+
+        speakGuidance(
+            message
+        );
+
+
+    }
+
+
+}
+
+/* VOICE NARRATION */
+
+function speakGuidance(
+    message
+) {
+
+
+    lastGuidanceText =
+        message;
+
+
+
+    document.getElementById(
+        "aiCaption"
+    ).textContent =
+        message;
+
+
+
+    if (
+        !(
+            "speechSynthesis"
+            in window
+        )
+    ) {
+
+
+        return;
+
+
+    }
+
+
+
+    window.speechSynthesis
+        .cancel();
+
+
+
+    const speech =
+
+        new SpeechSynthesisUtterance(
+
+            message
+
+        );
+
+    speech.rate =
+        0.85;
+
+
+    speech.pitch =
+        1;
+
+
+    speech.volume =
+        1;
+
+
+
+    window.speechSynthesis
+        .speak(
+
+            speech
+
+        );
+
+
+}
+
+/* REPEAT BUTTON */
+
+function repeatGuidance() {
+
+
+    if (
+        lastGuidanceText
+    ) {
+
+
+        speakGuidance(
+
+            lastGuidanceText
+
+        );
+
+
+    }
+
+
+}
+    
+
+/* =========================================
+   PATIENT HELP -> CAREGIVER SMS
+========================================= */
+function requestCaretakerHelp() {
+    const caretakerPhone = localStorage.getItem("caretakerPhone");
+
+    if (!caretakerPhone) {
+        alert("Caretaker phone number was not found. Please complete caretaker setup first.");
+        return;
+    }
+
+    const locationElement = document.getElementById("guideLocation");
+    let locationText = locationElement ? locationElement.textContent.trim() : "";
+
+    if (!locationText || locationText.toLowerCase().includes("finding")) {
+        locationText = "my current location";
+    }
+
+    const message =
+        "Recollective Alert: The patient is in need of help. " +
+        "Recollective currently shows their location as " + locationText + ".";
+
+    const separator = /iPhone|iPad|iPod/i.test(navigator.userAgent) ? "&" : "?";
+    window.location.href =
+        "sms:" + caretakerPhone + separator + "body=" + encodeURIComponent(message);
+}
+
+</script>
+
+
+</body>
+
+</html>
